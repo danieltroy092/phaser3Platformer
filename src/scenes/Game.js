@@ -1,11 +1,10 @@
+/// <reference path="../../typings/phaser.d.ts" />
 import Phaser from 'phaser';
 
 class Game extends Phaser.Scene {
   constructor() {
     super({ key: 'GameScene' });
   }
-
-  init(data) {}
 
   preload() {
     this.load.image('logo', 'assets/phaser3-logo.png');
