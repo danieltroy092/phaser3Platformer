@@ -1,5 +1,6 @@
 /// <reference path="../../typings/phaser.d.ts" />
 import Phaser from 'phaser';
+import Hero from '../entities/Hero';
 
 class Game extends Phaser.Scene {
   constructor() {
@@ -21,20 +22,8 @@ class Game extends Phaser.Scene {
       repeat: -1,
     });
 
-    //Load sprite onto canvas, and add physics body onto sprite for interaction with physics engine.
-    this.player = this.physics.add.sprite(250, 160, 'hero-run-sheet');
-
-    //assign animation to sprite.
-    this.player.anims.play('hero-running');
-
-    //set boundaries for game sprite not to fall off game scene.
-    this.player.body.setCollideWorldBounds(true);
-
-    //set collision box dimensions and center align.
-    this.player.body.setSize(12, 40);
-    this.player.body.setOffset(12, 23);
+    this.hero = new Hero(this, 250, 160);
   }
-
   update(time, delta) {}
 }
 
