@@ -1,5 +1,6 @@
 /// <reference path="../../typings/phaser.d.ts" />
 import Phaser from 'phaser';
+import StateMachine from 'javascript-state-machine';
 
 class Hero extends Phaser.GameObjects.Sprite {
   constructor(scene, x, y) {
@@ -22,6 +23,33 @@ class Hero extends Phaser.GameObjects.Sprite {
 
     // apply keyboard input functionality to hero
     this.keys = scene.cursorKeys;
+
+    this.setupMovement();
+  }
+
+  // state management
+  setupMovement() {
+    this.moveState = new StateMachine({
+      init: 'standing',
+      transitions: [
+        { name: 'jump', from: 'standing', to: 'jumping' },
+        { name: 'flip', from: 'jumping', to: 'flipping' },
+        { name: 'fall', from: 'standing', to: 'falling' },
+        {
+          name: 'touchdown',
+          from: ['jumping', 'flipping', 'falling'],
+          to: 'standing',
+        },
+      ],
+      methods: {
+        onJump: () => {
+          this.body.setVelocityY(-400);
+        },
+        onFlip: () => {
+          this.body.setVelocityY(-300);
+        },
+      },
+    });
   }
 
   preUpdate(time, delta) {
