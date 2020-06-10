@@ -15,11 +15,12 @@ class Hero extends Phaser.GameObjects.Sprite {
     // set boundaries for game sprite not to fall off game scene.
     this.body.setCollideWorldBounds(true);
 
-    // set collision box dimensions and center align.
-    this.body.setSize(12, 40);
-    this.body.setOffset(12, 23);
+    this.body.setSize(12, 40); // set collision box dimensions
+    this.body.setOffset(12, 23); // centre align sprite
+    this.body.setMaxVelocity(250, 400); // set max velocity for X/Y axis.
+    this.body.setDragX(750); // set deacceleration rate.
 
-    // apply keyboard input to hero
+    // apply keyboard input functionality to hero
     this.keys = scene.cursorKeys;
   }
 
@@ -28,15 +29,15 @@ class Hero extends Phaser.GameObjects.Sprite {
 
     // horizontal Movement
     if (this.keys.left.isDown) {
-      this.body.setVelocityX(-250);
+      this.body.setAccelerationX(-1000);
       this.setFlipX(true); // invert sprite when pressed.
       this.body.offset.x = 8; // re-align collision box to centre when inverted
     } else if (this.keys.right.isDown) {
-      this.body.setVelocityX(250);
+      this.body.setAccelerationX(1000);
       this.setFlipX(false); // reset inverted sprite.
       this.body.offset.x = 12; // reset collision box to centre.
     } else {
-      this.body.setVelocityX(0);
+      this.body.setAccelerationX(0);
     }
   }
 }
