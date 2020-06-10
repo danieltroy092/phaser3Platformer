@@ -27,7 +27,7 @@ class Hero extends Phaser.GameObjects.Sprite {
   preUpdate(time, delta) {
     super.preUpdate(time, delta);
 
-    // horizontal Movement
+    // horizontal movement
     if (this.keys.left.isDown) {
       this.body.setAccelerationX(-1000);
       this.setFlipX(true); // invert sprite when pressed.
@@ -38,6 +38,37 @@ class Hero extends Phaser.GameObjects.Sprite {
       this.body.offset.x = 12; // reset collision box to centre.
     } else {
       this.body.setAccelerationX(0);
+    }
+
+    // doesnt allow double jump if sprite is on ground.
+    if (this.body.onFloor()) {
+      this.canDoubleJump = false;
+    }
+
+    // if sprite velocity is below 0 then set sprite state is NOT jumping
+    if (this.body.velocity.y > 0) {
+      this.isJumping = false;
+    }
+
+    // vertical movement
+    const didPressJump = Phaser.Input.Keyboard.JustDown(this.keys.up);
+
+    // Jump when up key is pressed and sprite is on floor or on an object
+    if (didPressJump) {
+      if (this.body.onFloor()) {
+        this.isJumping = true;
+        this.canDoubleJump = true; // Can double jump if hero is currently jumping
+        this.body.setVelocityY(-400);
+      } else if (this.canDoubleJump) {
+        this.isJumping = true;
+        this.canDoubleJump = false; // limits double jump feature to once per button pressed.
+        this.body.setVelocityY(-300);
+      }
+    }
+
+    // when up key is not pressed & sprite velocity is above 150 while jumping
+    if (!this.keys.up.isDown && this.body.velocity.y < -150 && this.isJumping) {
+      this.body.setVelocityY(-150); // reset back to 150
     }
   }
 }
