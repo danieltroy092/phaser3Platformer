@@ -15,13 +15,19 @@ class Game extends Phaser.Scene {
   }
 
   create(data) {
+    //Capturing keyboard input
+    this.cursorKeys = this.input.keyboard.createCursorKeys();
+
+    // Initialises animation for sprite
     this.anims.create({
       key: 'hero-running',
       frames: this.anims.generateFrameNumbers('hero-run-sheet'),
       frameRate: 10, //10th of a second
-      repeat: -1,
+      repeat: -1, //-1 to run inifinitely
     });
 
+    // Creates a new hero on screen
+    // positioned in centre with hardcoded values
     this.hero = new Hero(this, 250, 160);
   }
   update(time, delta) {}
