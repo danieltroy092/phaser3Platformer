@@ -29,6 +29,11 @@ class Game extends Phaser.Scene {
     // creates a new hero on screen
     // positioned in centre with hardcoded values
     this.hero = new Hero(this, 250, 160);
+
+    // platform created to test falling state transition.
+    const platform = this.add.rectangle(220, 240, 260, 10, 0x4bcb7c);
+    this.physics.add.existing(platform, true);
+    this.physics.add.collider(this.hero, platform);
   }
   update(time, delta) {}
 }

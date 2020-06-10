@@ -23,6 +23,7 @@ class Hero extends Phaser.GameObjects.Sprite {
 
     // apply keyboard input functionality to hero
     this.keys = scene.cursorKeys;
+    this.input = {};
 
     this.setupMovement();
   }
@@ -42,6 +43,9 @@ class Hero extends Phaser.GameObjects.Sprite {
         },
       ],
       methods: {
+        onEnterState: (lifecycle) => {
+          console.log(lifecycle);
+        },
         onJump: () => {
           this.body.setVelocityY(-400);
         },
@@ -50,10 +54,28 @@ class Hero extends Phaser.GameObjects.Sprite {
         },
       },
     });
+
+    // state transitions
+    this.movePredicates = {
+      jump: () => {
+        return this.input.didPressJump;
+      },
+      flip: () => {
+        return this.input.didPressJump;
+      },
+      fall: () => {
+        return !this.body.onFloor();
+      },
+      touchdown: () => {
+        return this.body.onFloor();
+      },
+    };
   }
 
   preUpdate(time, delta) {
     super.preUpdate(time, delta);
+
+    this.input.didPressJump = Phaser.Input.Keyboard.JustDown(this.keys.up);
 
     // horizontal movement
     if (this.keys.left.isDown) {
@@ -68,35 +90,20 @@ class Hero extends Phaser.GameObjects.Sprite {
       this.body.setAccelerationX(0);
     }
 
-    // doesnt allow double jump if sprite is on ground.
-    if (this.body.onFloor()) {
-      this.canDoubleJump = false;
-    }
-
-    // if sprite velocity is below 0 then set sprite state is NOT jumping
-    if (this.body.velocity.y > 0) {
-      this.isJumping = false;
-    }
-
     // vertical movement
-    const didPressJump = Phaser.Input.Keyboard.JustDown(this.keys.up);
-
-    // Jump when up key is pressed and sprite is on floor or on an object
-    if (didPressJump) {
-      if (this.body.onFloor()) {
-        this.isJumping = true;
-        this.canDoubleJump = true; // Can double jump if hero is currently jumping
-        this.body.setVelocityY(-400);
-      } else if (this.canDoubleJump) {
-        this.isJumping = true;
-        this.canDoubleJump = false; // limits double jump feature to once per button pressed.
-        this.body.setVelocityY(-300);
+    if (this.moveState.is('jumping') || this.moveState.is('flipping')) {
+      // when Up key is not pressed & sprite velocity is above 150 while jumping
+      if (!this.keys.up.isDown && this.body.velocity.y < -150) {
+        this.body.setVelocityY(-150); // reset back to 150
       }
     }
 
-    // when up key is not pressed & sprite velocity is above 150 while jumping
-    if (!this.keys.up.isDown && this.body.velocity.y < -150 && this.isJumping) {
-      this.body.setVelocityY(-150); // reset back to 150
+    // checks which transitions are valid for current state.
+    for (const t of this.moveState.transitions()) {
+      if (t in this.movePredicates && this.movePredicates[t]()) {
+        this.moveState[t]();
+        break;
+      }
     }
   }
 }
