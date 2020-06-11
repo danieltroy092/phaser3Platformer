@@ -25,13 +25,69 @@ class Hero extends Phaser.GameObjects.Sprite {
     this.keys = scene.cursorKeys;
     this.input = {};
 
+    this.setupAnimations();
     this.setupMovement();
+  }
+
+  // animation state machine
+  setupAnimations() {
+    this.animState = new StateMachine({
+      init: 'idle', // starting state
+      transitions: [
+        { name: 'idle', from: ['falling', 'running', 'pivoting'], to: 'idle' },
+        { name: 'run', from: ['falling', 'idle', 'pivoting'], to: 'running' },
+        { name: 'pivot', from: ['falling', 'running'], to: 'pivoting' },
+        { name: 'jump', from: ['idle', 'running', 'pivoting'], to: 'jumping' },
+        { name: 'flip', from: ['jumping', 'falling'], to: 'flipping' },
+        { name: 'fall', from: '*', to: 'falling' }, // '*' wildcard for all states
+      ],
+      methods: {
+        onEnterState: (lifecycle) => {
+          this.anims.play('hero-' + lifecycle.to);
+          console.log(lifecycle);
+        },
+      },
+    });
+
+    // animation transitions
+    this.animPredicates = {
+      idle: () => {
+        // sprite on the ground, not moving
+        return this.body.onFloor() && this.body.velocity.x === 0;
+      },
+      run: () => {
+        return (
+          // sprite on the ground
+          this.body.onFloor() && // moving horizontally & facing the direction we're moving to
+          Math.sign(this.body.velocity.x) === (this.flipX ? -1 : 1)
+        );
+      },
+      pivot: () => {
+        return (
+          // sprite on the ground
+          this.body.onFloor() && // moving horizontally & invert sprite direction
+          Math.sign(this.body.velocity.x) === (this.flipX ? 1 : -1)
+        );
+      },
+      jump: () => {
+        // sprite is moving upwards
+        return this.body.velocity.y < 0;
+      },
+      flip: () => {
+        // sprite is moving upwards, then check if sprite is in 'flipping' state
+        return this.body.velocity.y < 0 && this.moveState.is('flipping');
+      },
+      fall: () => {
+        // sprite is moving downwards
+        return this.body.velocity.y > 0;
+      },
+    };
   }
 
   // state management
   setupMovement() {
     this.moveState = new StateMachine({
-      init: 'standing',
+      init: 'standing', // starting state
       transitions: [
         { name: 'jump', from: 'standing', to: 'jumping' },
         { name: 'flip', from: 'jumping', to: 'flipping' },
@@ -43,9 +99,6 @@ class Hero extends Phaser.GameObjects.Sprite {
         },
       ],
       methods: {
-        onEnterState: (lifecycle) => {
-          console.log(lifecycle);
-        },
         onJump: () => {
           this.body.setVelocityY(-400);
         },
@@ -102,6 +155,14 @@ class Hero extends Phaser.GameObjects.Sprite {
     for (const t of this.moveState.transitions()) {
       if (t in this.movePredicates && this.movePredicates[t]()) {
         this.moveState[t]();
+        break;
+      }
+    }
+
+    // checks which animations are valid for current state
+    for (const t of this.animState.transitions()) {
+      if (t in this.animPredicates && this.animPredicates[t]()) {
+        this.animState[t]();
         break;
       }
     }
