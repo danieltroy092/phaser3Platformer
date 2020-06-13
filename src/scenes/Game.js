@@ -7,8 +7,14 @@ class Game extends Phaser.Scene {
     super({ key: 'GameScene' });
   }
 
-  // loading spritesheet images
   preload() {
+    // loading tilemap
+    this.load.tilemapTiledJSON('level-1', 'assets/tilemaps/level-1.json');
+
+    // loading tileset
+    this.load.image('world-1-sheet', 'assets/tilesets/world-1.png');
+
+    // loading spritesheet images
     this.load.spritesheet('hero-idle-sheet', 'assets/hero/idle.png', {
       frameWidth: 32,
       frameHeight: 64,
@@ -83,15 +89,25 @@ class Game extends Phaser.Scene {
       repeat: -1, // -1 to run infinitely
     });
 
+    // Loads game level
+    this.addMap();
+
     // creates a new hero on screen
     // positioned in centre with hardcoded values
     this.hero = new Hero(this, 250, 160);
-
-    // platform created to test falling state transition.
-    const platform = this.add.rectangle(220, 240, 260, 10, 0x4bcb7c);
-    this.physics.add.existing(platform, true);
-    this.physics.add.collider(this.hero, platform);
   }
+
+  addMap() {
+    // loads map
+    this.map = this.make.tilemap({ key: 'level-1' });
+
+    // add tileset image
+    const groundTiles = this.map.addTilesetImage('world-1', 'world-1-sheet');
+
+    // create the layer
+    this.map.createStaticLayer('Ground', groundTiles);
+  }
+
   update(time, delta) {}
 }
 
