@@ -13,6 +13,7 @@ class Game extends Phaser.Scene {
 
     // loading tileset
     this.load.image('world-1-sheet', 'assets/tilesets/world-1.png');
+    this.load.image('clouds-sheet', 'assets/tilesets/clouds.png');
 
     // loading spritesheet images
     this.load.spritesheet('hero-idle-sheet', 'assets/hero/idle.png', {
@@ -130,8 +131,18 @@ class Game extends Phaser.Scene {
   addMap() {
     this.map = this.make.tilemap({ key: 'level-1' });
 
-    // add tileset image
+    // add tileset images
     const groundTiles = this.map.addTilesetImage('world-1', 'world-1-sheet');
+    const backgroundTiles = this.map.addTilesetImage('clouds', 'clouds-sheet');
+
+    // create background layer
+    const backgroundLayer = this.map.createStaticLayer(
+      'Background',
+      backgroundTiles
+    );
+
+    // Set parallax scrolling effect on background layer
+    backgroundLayer.setScrollFactor(0.6);
 
     // create ground layer
     const groundLayer = this.map.createStaticLayer('Ground', groundTiles);
