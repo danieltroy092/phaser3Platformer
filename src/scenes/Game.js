@@ -95,6 +95,18 @@ class Game extends Phaser.Scene {
     // creates a new hero on screen
     // positioned in centre with hardcoded values
     this.hero = new Hero(this, 250, 160);
+
+    // camera manager
+    // Set camera to stay within bounds
+    this.cameras.main.setBounds(
+      0,
+      0,
+      this.map.widthInPixels,
+      this.map.heightInPixels
+    );
+
+    // Set camera to follow hero
+    this.cameras.main.startFollow(this.hero);
   }
 
   addMap() {
@@ -106,6 +118,15 @@ class Game extends Phaser.Scene {
 
     // create the layer
     this.map.createStaticLayer('Ground', groundTiles);
+
+    // set tilemap size in-line with browser screen size
+    this.physics.world.setBounds(
+      0,
+      0,
+      this.map.widthInPixels,
+      this.map.heightInPixels
+    );
+    this.physics.world.setBoundsCollision(true, true, false, true); // stop collision with top of screen
   }
 
   update(time, delta) {}
