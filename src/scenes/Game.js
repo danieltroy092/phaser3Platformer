@@ -113,6 +113,12 @@ class Game extends Phaser.Scene {
     // positioned in centre with hardcoded values
     this.hero = new Hero(this, 250, 160);
 
+    //  position hero to move behind the foreground layer via index
+    this.children.moveTo(
+      this.hero,
+      this.children.getIndex(this.map.getLayer('Foreground').tilemapLayer)
+    );
+
     // add a collider physics for the hero and 'Ground' layer.
     this.physics.add.collider(
       this.hero,
@@ -127,9 +133,12 @@ class Game extends Phaser.Scene {
     // add tileset image
     const groundTiles = this.map.addTilesetImage('world-1', 'world-1-sheet');
 
-    // create layer
+    // create ground layer
     const groundLayer = this.map.createStaticLayer('Ground', groundTiles);
     groundLayer.setCollision([1, 2, 4], true); // set which tiles to collide with
+
+    // create foreground layer
+    this.map.createStaticLayer('Foreground', groundTiles);
 
     // set tilemap size in-line with browser screen size
     this.physics.world.setBounds(
