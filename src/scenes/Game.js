@@ -111,8 +111,7 @@ class Game extends Phaser.Scene {
 
   // creates a new hero on screen
   addHero() {
-    // positioned in centre with hardcoded values
-    this.hero = new Hero(this, 250, 160);
+    this.hero = new Hero(this, this.spawnPos.x, this.spawnPos.y);
 
     //  position hero to move behind the foreground layer via index
     this.children.moveTo(
@@ -159,6 +158,14 @@ class Game extends Phaser.Scene {
       this.map.heightInPixels
     );
     this.physics.world.setBoundsCollision(true, true, false, true); // stop collision with top of screen
+
+    // Get data from object layer via Loop
+    this.map.getObjectLayer('Objects').objects.forEach((object) => {
+      if (object.name === 'Start') {
+        // get object called 'Start'
+        this.spawnPos = { x: object.x, y: object.y }; // get position of object
+      }
+    });
   }
 
   update(time, delta) {}

@@ -10,6 +10,9 @@ class Hero extends Phaser.GameObjects.Sprite {
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
+    // set hero origin centre offset
+    this.setOrigin(0.5, 1);
+
     // assign animation to sprite.
     this.anims.play('hero-running');
 
