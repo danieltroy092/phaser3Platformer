@@ -152,9 +152,6 @@ class Game extends Phaser.Scene {
     const groundLayer = this.map.createStaticLayer('Ground', groundTiles);
     groundLayer.setCollision([1, 2, 4], true); // set which tiles to collide with
 
-    // create foreground layer
-    this.map.createStaticLayer('Foreground', groundTiles);
-
     // set tilemap size in-line with browser screen size
     this.physics.world.setBounds(
       0,
@@ -178,17 +175,21 @@ class Game extends Phaser.Scene {
         this.spawnPos = { x: object.x, y: object.y }; // get position of  start object
       } // check if spike object with ID num 7 exist
       if (object.gid === 7) {
-        // creates new object, then add to group
+        // creates new spike object, then add to group
         const spike = this.spikeGroup.create(
           object.x,
           object.y,
           'world-1-sheet',
           object.gid - 1
         );
-        // set origin for spike
-        spike.setOrigin(0, 1);
+        spike.setOrigin(0, 1); // set origin for spike
+        spike.setSize(object.width - 10, object.height - 10); // set size for spike collision box
+        spike.setOffset(5, 10); // set position for spike collision box
       }
     });
+
+    // create foreground layer
+    this.map.createStaticLayer('Foreground', groundTiles);
   }
 
   update(time, delta) {}
