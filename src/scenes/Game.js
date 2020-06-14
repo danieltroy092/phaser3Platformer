@@ -11,8 +11,13 @@ class Game extends Phaser.Scene {
     // loading tilemap
     this.load.tilemapTiledJSON('level-1', 'assets/tilemaps/level-1.json');
 
-    // loading tileset
-    this.load.image('world-1-sheet', 'assets/tilesets/world-1.png');
+    // loading tileset spritesheet
+    this.load.spritesheet('world-1-sheet', 'assets/tilesets/world-1.png', {
+      frameWidth: 32,
+      frameHeight: 32,
+      margin: 1,
+      spacing: 2,
+    });
     this.load.image('clouds-sheet', 'assets/tilesets/clouds.png');
 
     // loading spritesheet images
@@ -159,11 +164,29 @@ class Game extends Phaser.Scene {
     );
     this.physics.world.setBoundsCollision(true, true, false, true); // stop collision with top of screen
 
+    // Physics collider for spikes
+    this.spikeGroup = this.physics.add.group({
+      immovable: true,
+      allowGravity: false,
+    });
+
+    // Getting start point of Hero
     // Get data from object layer via Loop
     this.map.getObjectLayer('Objects').objects.forEach((object) => {
       if (object.name === 'Start') {
         // get object called 'Start'
-        this.spawnPos = { x: object.x, y: object.y }; // get position of object
+        this.spawnPos = { x: object.x, y: object.y }; // get position of  start object
+      } // check if spike object with ID num 7 exist
+      if (object.gid === 7) {
+        // creates new object, then add to group
+        const spike = this.spikeGroup.create(
+          object.x,
+          object.y,
+          'world-1-sheet',
+          object.gid - 1
+        );
+        // set origin for spike
+        spike.setOrigin(0, 1);
       }
     });
   }
