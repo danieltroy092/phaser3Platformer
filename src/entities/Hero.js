@@ -42,7 +42,12 @@ class Hero extends Phaser.GameObjects.Sprite {
         { name: 'pivot', from: ['falling', 'running'], to: 'pivoting' },
         { name: 'jump', from: ['idle', 'running', 'pivoting'], to: 'jumping' },
         { name: 'flip', from: ['jumping', 'falling'], to: 'flipping' },
-        { name: 'fall', from: '*', to: 'falling' }, // '*' wildcard for all states
+        {
+          name: 'fall',
+          from: ['idle', 'running', 'pivoting', 'jumping', 'flipping'],
+          to: 'falling',
+        },
+        { name: 'die', from: '*', to: 'dead' }, // '*' wildcard for all states
       ],
       methods: {
         onEnterState: (lifecycle) => {
@@ -100,6 +105,7 @@ class Hero extends Phaser.GameObjects.Sprite {
           from: ['jumping', 'flipping', 'falling'],
           to: 'standing',
         },
+        { name: 'die', from: '*', to: 'dead' },
       ],
       methods: {
         onJump: () => {
@@ -107,6 +113,10 @@ class Hero extends Phaser.GameObjects.Sprite {
         },
         onFlip: () => {
           this.body.setVelocityY(-300);
+        },
+        onDie: () => {
+          this.body.setVelocity(0, -500);
+          this.body.setAcceleration(0);
         },
       },
     });
@@ -128,17 +138,29 @@ class Hero extends Phaser.GameObjects.Sprite {
     };
   }
 
+  // Start death sequence
+  kill() {
+    this.moveState.die();
+    this.animState.die();
+  }
+
+  isDead() {
+    return this.moveState.is('dead');
+  }
+
   preUpdate(time, delta) {
     super.preUpdate(time, delta);
 
-    this.input.didPressJump = Phaser.Input.Keyboard.JustDown(this.keys.up);
+    // allow movement when only not in dead state
+    this.input.didPressJump =
+      !this.isDead() && Phaser.Input.Keyboard.JustDown(this.keys.up);
 
     // horizontal movement
-    if (this.keys.left.isDown) {
+    if (!this.isDead() && this.keys.left.isDown) {
       this.body.setAccelerationX(-1000);
       this.setFlipX(true); // invert sprite when pressed.
       this.body.offset.x = 8; // re-align collision box to centre when inverted
-    } else if (this.keys.right.isDown) {
+    } else if (!this.isDead() && this.keys.right.isDown) {
       this.body.setAccelerationX(1000);
       this.setFlipX(false); // reset inverted sprite.
       this.body.offset.x = 12; // reset collision box to centre.
