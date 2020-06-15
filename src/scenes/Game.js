@@ -135,15 +135,28 @@ class Game extends Phaser.Scene {
     );
 
     // add a collider physics for the hero and 'Ground' layer.
-    this.physics.add.collider(
+    const groundCollider = this.physics.add.collider(
       this.hero,
       this.map.getLayer('Ground').tilemapLayer
     );
 
-    // check death sequence works
-    setTimeout(() => {
-      this.hero.kill();
-    }, 3000);
+    // add a collider physics for hero and spike group
+    const spikesCollider = this.physics.add.overlap(
+      this.hero,
+      this.spikeGroup,
+      () => {
+        //  if successful
+        this.hero.kill(); // run kill sequence
+      }
+    );
+
+    //  on died state
+    this.hero.on('died', () => {
+      groundCollider.destroy(); // destroy collider for ground layer
+      spikesCollider.destroy(); // destroy collider for spikes object
+      this.hero.body.setCollideWorldBounds(false); // allows hero to go out of bounds
+      this.cameras.main.stopFollow(); // stop camera from following hero
+    });
   }
 
   // loads map

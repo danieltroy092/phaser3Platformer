@@ -105,7 +105,11 @@ class Hero extends Phaser.GameObjects.Sprite {
           from: ['jumping', 'flipping', 'falling'],
           to: 'standing',
         },
-        { name: 'die', from: '*', to: 'dead' },
+        {
+          name: 'die',
+          from: ['jumping', 'flipping', 'falling', 'standing'],
+          to: 'dead',
+        },
       ],
       methods: {
         onJump: () => {
@@ -140,8 +144,11 @@ class Hero extends Phaser.GameObjects.Sprite {
 
   // Start death sequence
   kill() {
-    this.moveState.die();
-    this.animState.die();
+    if (this.moveState.can('die')) {
+      this.moveState.die(); // set move state to dead
+      this.animState.die(); // set animation state to dead
+      this.emit('died'); // claim hero has'died'
+    }
   }
 
   isDead() {
