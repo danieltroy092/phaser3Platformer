@@ -22,10 +22,10 @@ export default {
     default: 'arcade',
     arcade: {
       gravity: { y: 750 },
-      debug: true,
-      debugShowVelocity: true,
-      debugShowBody: true,
-      debugShowStaticBody: true,
+      debug: false,
+      debugShowVelocity: false,
+      debugShowBody: false,
+      debugShowStaticBody: false,
     },
   },
 };

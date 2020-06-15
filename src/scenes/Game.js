@@ -119,14 +119,14 @@ class Game extends Phaser.Scene {
       this.map.widthInPixels,
       this.map.heightInPixels
     );
-
-    // Set camera to follow hero
-    this.cameras.main.startFollow(this.hero);
   }
 
   // creates a new hero on screen
   addHero() {
     this.hero = new Hero(this, this.spawnPos.x, this.spawnPos.y);
+
+    // Set camera to follow hero
+    this.cameras.main.startFollow(this.hero);
 
     //  position hero to move behind the foreground layer via index
     this.children.moveTo(
@@ -220,7 +220,19 @@ class Game extends Phaser.Scene {
     this.map.createStaticLayer('Foreground', groundTiles);
   }
 
-  update(time, delta) {}
+  // reset sequence
+  update(time, delta) {
+    const cameraBottom = this.cameras.main.getWorldPoint(
+      0,
+      this.cameras.main.height
+    ).y;
+
+    // if hero is dead & the top of hero is below camera
+    if (this.hero.isDead() && this.hero.getBounds().top > cameraBottom + 100) {
+      this.hero.destroy(); // destroy hero
+      this.addHero(); // then add new hero
+    }
+  }
 }
 
 export default Game;
