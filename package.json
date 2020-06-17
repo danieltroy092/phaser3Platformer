@@ -1,19 +1,21 @@
 {
   "name": "phaser3-es6-webpack-boilerplate",
   "version": "1.0.0",
-  "description": "A boilerplate project for creating games with Phaser3, ES6 and Webpack",
-  "main": "index.js",
+  "description": "2D platformer",
+  "main": "app.js",
   "engines": {
     "node": "10.16.3",
     "npm": "6.9.0"
   },
   "scripts": {
-    "start": "webpack-dev-server --mode development",
+    "start": "webpack-dev-server --mode development --open",
+    "dev": "node server.js",
+    "heroku-postbuild": "webpack -p",
     "build": "webpack --mode production",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Jed Hastwell",
-  "repository": "https://github.com/jedhastwell/phaser3-es6-webpack-boilerplate",
+  "author": "Troy Ong",
+  "repository": "https://github.com/danieltroy092/phaser3Platformer",
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.8.3",
@@ -29,6 +31,7 @@
     "webpack-dev-server": "^3.10.1"
   },
   "dependencies": {
+    "express": "^4.17.1",
     "javascript-state-machine": "^3.1.0",
     "phaser": "^3.22.0"
   }
